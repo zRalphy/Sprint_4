@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  title: Time API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- name: api
+- name: auth
+paths:
+  /api/time:
+    get:
+      operationId: time
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeResponse'
+          description: Current time
+        "401":
+          description: Missing authentication token
+        "403":
+          description: Access forbiden
+      security:
+      - jwtToken: []
+      summary: Returns current time in user time zone
+      tags:
+      - api
+      x-accepts: application/json
+      x-tags:
+      - tag: api
+  /api/user/profile:
+    put:
+      operationId: profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeResponse'
+          description: Current time
+        "401":
+          description: Missing authentication token
+        "403":
+          description: Access forbiden
+      security:
+      - jwtToken: []
+      summary: Changes user profile
+      tags:
+      - api
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: api
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Succesful authentication
+          headers:
+            Authorization:
+              description: JWT Token
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "400":
+          description: Request body is invalid
+        "401":
+          description: Password in incorrect
+        "404":
+          description: User doesn\'t exists
+      summary: Authenticate the user
+      tags:
+      - auth
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: auth
+  /auth/register:
+    post:
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterRequest'
+        required: true
+      responses:
+        "200":
+          description: User created
+          headers:
+            userId:
+              description: User identifier
+              explode: false
+              schema:
+                type: integer
+              style: simple
+        "400":
+          description: Request body is invalid
+        "409":
+          description: User already exists
+      summary: Creates new user
+      tags:
+      - auth
+      x-content-type: application/json
+      x-accepts: application/json
+      x-tags:
+      - tag: auth
+components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: Resource is forbidden
+    NotFoundError:
+      description: Resource not found
+  schemas:
+    UserLoginRequest:
+      example:
+        password: password
+        userName: userName
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - userName
+      type: object
+    UserRegisterRequest:
+      example:
+        password: password
+        userName: userName
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - userName
+      type: object
+    UserProfileRequest:
+      example:
+        timezone: Europe/Warsaw
+      properties:
+        timezone:
+          example: Europe/Warsaw
+          type: string
+      required:
+      - timezone
+      type: object
+    TimeResponse:
+      example:
+        time: 2000-01-23T04:56:07.000+00:00
+      properties:
+        time:
+          format: date-time
+          type: string
+      required:
+      - time
+      type: object
+  securitySchemes:
+    jwtToken:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
