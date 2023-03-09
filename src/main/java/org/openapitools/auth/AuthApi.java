@@ -3,7 +3,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package org.openapitools.api;
+package org.openapitools.auth;
 
 import org.openapitools.model.UserLoginRequest;
 import org.openapitools.model.UserRegisterRequest;
